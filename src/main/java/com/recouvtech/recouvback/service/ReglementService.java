@@ -9,6 +9,7 @@ import com.recouvtech.recouvback.dao.CreanceRepository;
 import com.recouvtech.recouvback.dao.ReglementRepository;
 import com.recouvtech.recouvback.dao.UtilisateurRepository;
 import com.recouvtech.recouvback.entity.enums.StatutReglement;
+import com.recouvtech.recouvback.mapper.ReglementMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +27,6 @@ public class ReglementService {
 
     @Transactional
     public ReglementResponseDTO create(ReglementRequestDTO dto) {
-        Reglement r = new Reglement();
-        r.setMontant(dto.getMontant());
-        r.setDateReglement(dto.getDateReglement());
-        r.setModePaiement(dto.getModePaiement());
-        r.setStatut(dto.getStatut() != null ? dto.getStatut() : StatutReglement.NON_EFFECTUE);
-        r.setReference(dto.getReference());
-
         Creance creance = creanceRepository.findByNumFacture(dto.getNumFacture());
         if (creance == null) {
             throw new RuntimeException("Créance not found with numFacture: " + dto.getNumFacture());
@@ -43,8 +37,8 @@ public class ReglementService {
             throw new RuntimeException("Agent not found with name: " + dto.getAgentName());
         }
 
-        r.setCreance(creance);
-        r.setAgentRecouv(agent);
+        Reglement r = ReglementMapper.fromRequestDto(dto, creance, agent);
+        r.setStatut(dto.getStatut() != null ? dto.getStatut() : StatutReglement.NON_EFFECTUE);
 
         // Sauvegarde du règlement
         Reglement saved = reglementRepository.save(r);
@@ -54,15 +48,15 @@ public class ReglementService {
             updateCreanceMontantEncaisse(creance);
         }
 
-        return mapToDto(saved);
+        return ReglementMapper.toDto(saved);
     }
 
     public List<ReglementResponseDTO> getAll() {
-        return reglementRepository.findAll().stream().map(this::mapToDto).collect(Collectors.toList());
+        return reglementRepository.findAll().stream().map(ReglementMapper::toDto).collect(Collectors.toList());
     }
 
     public ReglementResponseDTO getById(Long id) {
-        return reglementRepository.findById(id).map(this::mapToDto)
+        return reglementRepository.findById(id).map(ReglementMapper::toDto)
                 .orElseThrow(() -> new RuntimeException("Reglement not found with id: " + id));
     }
 
@@ -75,12 +69,6 @@ public class ReglementService {
         StatutReglement newStatut = dto.getStatut() != null ? dto.getStatut() : r.getStatut();
         boolean willBeEffectue = newStatut == StatutReglement.EFFECTUE;
 
-        r.setMontant(dto.getMontant());
-        r.setDateReglement(dto.getDateReglement());
-        r.setModePaiement(dto.getModePaiement());
-        r.setStatut(newStatut);
-        r.setReference(dto.getReference());
-
         Creance creance = creanceRepository.findByNumFacture(dto.getNumFacture());
         if (creance == null) {
             throw new RuntimeException("Créance not found with numFacture: " + dto.getNumFacture());
@@ -91,8 +79,8 @@ public class ReglementService {
             throw new RuntimeException("Agent not found with name: " + dto.getAgentName());
         }
 
-        r.setCreance(creance);
-        r.setAgentRecouv(agent);
+        ReglementMapper.updateFromRequestDto(r, dto, creance, agent);
+        r.setStatut(newStatut);
 
         Reglement saved = reglementRepository.save(r);
 
@@ -101,7 +89,7 @@ public class ReglementService {
             updateCreanceMontantEncaisse(creance);
         }
 
-        return mapToDto(saved);
+        return ReglementMapper.toDto(saved);
     }
 
     @Transactional
@@ -133,7 +121,7 @@ public class ReglementService {
             updateCreanceMontantEncaisse(reglement.getCreance());
         }
         
-        return mapToDto(saved);
+        return ReglementMapper.toDto(saved);
     }
 
     private void updateCreanceMontantEncaisse(Creance creance) {
@@ -144,28 +132,5 @@ public class ReglementService {
                 
         creance.setMontantEncaisse(totalEncaisse);
         creanceRepository.save(creance);
-    }
-
-    private ReglementResponseDTO mapToDto(Reglement r) {
-        ReglementResponseDTO dto = new ReglementResponseDTO();
-        dto.setId(r.getId());
-        dto.setMontant(r.getMontant());
-        dto.setDateReglement(r.getDateReglement());
-        dto.setModePaiement(r.getModePaiement());
-        dto.setStatut(r.getStatut());
-        dto.setReference(r.getReference());
-        dto.setClientName(r.getCreance().getClient().getRaisonSociale());
-
-        if (r.getCreance() != null)
-            dto.setNumFacture(r.getCreance().getNumFacture());
-        else
-            dto.setNumFacture(null);
-
-        if (r.getAgentRecouv() != null)
-            dto.setAgentName(r.getAgentRecouv().getNom());
-        else
-            dto.setAgentName(null);
-
-        return dto;
     }
 }
