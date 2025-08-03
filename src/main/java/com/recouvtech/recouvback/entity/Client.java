@@ -26,6 +26,12 @@ public class Client {
     @Column(name = "adresse")
     private String adresse;
 
+    @Column(name = "ice")
+    private String ice;
+
+    @Column(name = "identite_fiscale")
+    private String identiteFiscale;
+
     @ManyToOne
     @JoinColumn(name = "id_agent_recouv")
     private Utilisateur agentRecouv;

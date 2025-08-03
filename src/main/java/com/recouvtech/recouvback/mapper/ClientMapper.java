@@ -15,6 +15,8 @@ public class ClientMapper {
         dto.setTelephone(client.getTelephone());
         dto.setRc(client.getRc());
         dto.setAdresse(client.getAdresse());
+        dto.setIce(client.getIce());
+        dto.setIdentiteFiscale(client.getIdentiteFiscale());
         dto.setAgentName(client.getAgentRecouv() != null ? client.getAgentRecouv().getNom() : null);
         return dto;
     }
@@ -27,6 +29,8 @@ public class ClientMapper {
         client.setTelephone(dto.getTelephone());
         client.setRc(dto.getRc());
         client.setAdresse(dto.getAdresse());
+        client.setIce(dto.getIce());
+        client.setIdentiteFiscale(dto.getIdentiteFiscale());
         client.setAgentRecouv(agent);
         return client;
     }
@@ -37,6 +41,8 @@ public class ClientMapper {
         client.setTelephone(dto.getTelephone());
         client.setRc(dto.getRc());
         client.setAdresse(dto.getAdresse());
+        client.setIce(dto.getIce());
+        client.setIdentiteFiscale(dto.getIdentiteFiscale());
         client.setAgentRecouv(agent);
     }
 } 

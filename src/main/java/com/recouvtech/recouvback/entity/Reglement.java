@@ -19,7 +19,7 @@ public class Reglement {
     private long id;
 
     @Column(name = "montant")
-    private double montant;
+    private Double montant;
 
     @Column(name = "date_reglement")
     private LocalDate dateReglement;

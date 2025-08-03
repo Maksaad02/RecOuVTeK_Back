@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +26,16 @@ public class Creance {
     private LocalDate echeance;
 
     @Column(name = "montant_facture")
-    private double montantFacture;
+    private Double montantFacture;
 
     @Column(name = "montant_encaisse")
-    private double montantEncaisse;
+    private Double montantEncaisse;
+
+    @Column(name = "montant_penalites")
+    private Double montantPenalites = 0.0;
+
+    @Column(name = "date_calcul_penalites")
+    private LocalDate dateCalculPenalites;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statut")
@@ -46,11 +53,24 @@ public class Creance {
     private List<Reglement> reglements = new ArrayList<>();
 
     @Transient
-    public double getSolde() {
+    public Double getSolde() {
         return this.montantFacture - this.montantEncaisse;
     }
 
-    public void setMontantEncaisse(double montantEncaisse) {
+    @Transient
+    public Double getMontantTotal() {
+        return this.montantFacture + this.montantPenalites;
+    }
+
+    @Transient
+    public int getJoursRetard() {
+        if (this.echeance == null || LocalDate.now().isBefore(this.echeance)) {
+            return 0;
+        }
+        return (int) ChronoUnit.DAYS.between(this.echeance, LocalDate.now());
+    }
+
+    public void setMontantEncaisse(Double montantEncaisse) {
         this.montantEncaisse = montantEncaisse;
         updateStatut();
     }
@@ -60,10 +80,16 @@ public class Creance {
             this.statut = StatutCreance.PAYEE;
         } else if (this.montantEncaisse > 0) {
             this.statut = StatutCreance.PARTIELLEMENT_PAYEE;
-        } else if (LocalDate.now().isAfter(this.echeance)) {
-            this.statut = StatutCreance.EN_RETARD;
         } else {
-            this.statut = StatutCreance.IMPAYEE;
+            // Calculer le statut basé sur le retard
+            int joursRetard = getJoursRetard();
+            if (joursRetard >= 60) {
+                this.statut = StatutCreance.PENALISEE;
+            } else if (joursRetard > 0) {
+                this.statut = StatutCreance.EN_RETARD;
+            } else {
+                this.statut = StatutCreance.IMPAYEE;
+            }
         }
     }
 }

@@ -5,6 +5,8 @@ import com.recouvtech.recouvback.dto.ReglementDTO.ReglementResponseDTO;
 import com.recouvtech.recouvback.entity.Reglement;
 import com.recouvtech.recouvback.entity.Creance;
 import com.recouvtech.recouvback.entity.Utilisateur;
+import com.recouvtech.recouvback.entity.enums.ModePaiement;
+import com.recouvtech.recouvback.entity.enums.StatutReglement;
 
 public class ReglementMapper {
     public static ReglementResponseDTO toDto(Reglement reglement) {
@@ -19,6 +21,7 @@ public class ReglementMapper {
         dto.setNumFacture(reglement.getCreance() != null ? reglement.getCreance().getNumFacture() : null);
         dto.setAgentName(reglement.getAgentRecouv() != null ? reglement.getAgentRecouv().getNom() : null);
         dto.setClientName(reglement.getCreance() != null && reglement.getCreance().getClient() != null ? reglement.getCreance().getClient().getRaisonSociale() : null);
+
         return dto;
     }
 

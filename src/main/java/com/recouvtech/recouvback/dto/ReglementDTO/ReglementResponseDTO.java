@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 public class ReglementResponseDTO {
     private Long id;
-    private double montant;
+    private Double montant;
     private LocalDate dateReglement;
     private ModePaiement modePaiement;
     private StatutReglement statut;
@@ -17,4 +17,5 @@ public class ReglementResponseDTO {
     private String numFacture;
     private String agentName;
     private String clientName;
+
 }

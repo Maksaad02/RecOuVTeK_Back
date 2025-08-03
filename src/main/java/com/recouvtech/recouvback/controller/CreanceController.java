@@ -4,6 +4,7 @@ import com.recouvtech.recouvback.dto.CreanceDTO.CreanceRequestDTO;
 import com.recouvtech.recouvback.dto.CreanceDTO.CreanceResponseDTO;
 import com.recouvtech.recouvback.service.CreanceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,5 +40,11 @@ public class CreanceController {
     @DeleteMapping("/{numFacture}")
     public void delete(@PathVariable String numFacture) {
         creanceService.deleteCreance(numFacture);
+    }
+    
+    @PostMapping("/recalculer-penalites")
+    public ResponseEntity<String> recalculerPenalites() {
+        creanceService.recalculerToutesPenalites();
+        return ResponseEntity.ok("Recalcul des pénalités terminé avec succès");
     }
 }
