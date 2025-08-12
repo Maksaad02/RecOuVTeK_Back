@@ -18,6 +18,7 @@ public class CreanceMapper {
         dto.setMontantEncaisse(creance.getMontantEncaisse());
         dto.setSolde(creance.getSolde());
         dto.setMontantPenalites(creance.getMontantPenalites());
+        dto.setMontantTotal(creance.getMontantTotal());
         dto.setJoursRetard(creance.getJoursRetard());
         dto.setStatut(creance.getStatut() != null ? creance.getStatut().name() : null);
         dto.setAgentName(creance.getAgentRecouv() != null ? creance.getAgentRecouv().getNom() : null);

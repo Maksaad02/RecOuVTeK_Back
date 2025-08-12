@@ -13,6 +13,7 @@ public class CreanceResponseDTO {
     private Double montantEncaisse;
     private Double solde;
     private Double montantPenalites;
+    private Double montantTotal;
     private int joursRetard;
     private String statut;
     private String agentName;

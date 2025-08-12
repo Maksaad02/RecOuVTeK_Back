@@ -54,7 +54,7 @@ public class Creance {
 
     @Transient
     public Double getSolde() {
-        return this.montantFacture - this.montantEncaisse;
+        return (this.montantFacture + this.montantPenalites) - this.montantEncaisse;
     }
 
     @Transient

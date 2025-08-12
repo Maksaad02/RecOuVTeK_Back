@@ -46,6 +46,7 @@ com\recouvtech\recouvback\entity\enums\ModePaiement.class
 com\recouvtech\recouvback\entity\enums\StatutCreance.class
 com\recouvtech\recouvback\controller\ReglementController.class
 com\recouvtech\recouvback\dto\CreanceDTO\CreanceRequestDTO.class
+com\recouvtech\recouvback\service\PenaliteService.class
 com\recouvtech\recouvback\service\UtilisateurService.class
 com\recouvtech\recouvback\service\EmailServiceImpl.class
 com\recouvtech\recouvback\dto\RoleDTO\RoleResponseDTO.class
