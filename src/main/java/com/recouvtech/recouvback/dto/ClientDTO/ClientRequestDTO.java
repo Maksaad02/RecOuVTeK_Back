@@ -9,5 +9,7 @@ public class ClientRequestDTO {
     private String telephone;
     private String rc;
     private String adresse;
+    private String ice;
+    private String identiteFiscale;
     private String agentName;
 }

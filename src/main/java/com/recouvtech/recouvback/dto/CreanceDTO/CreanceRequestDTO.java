@@ -9,8 +9,8 @@ public class CreanceRequestDTO {
     private String numFacture;
     private LocalDate dateEmission;
     private LocalDate echeance;
-    private double montantFacture;
-    private double montantEncaisse;
+    private Double montantFacture;
+    private Double montantEncaisse;
     private String statut; // Enum sous forme de String
     private String agentName;
     private String clientName; // raisonSociale
