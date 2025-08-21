@@ -11,6 +11,7 @@ import com.recouvtech.recouvback.entity.Utilisateur;
 import com.recouvtech.recouvback.entity.enums.StatutCreance;
 import com.recouvtech.recouvback.mapper.CreanceMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,9 @@ public class CreanceService {
     private final UtilisateurRepository utilisateurRepository;
     private final ClientRepository clientRepository;
     private final PenaliteService penaliteService;
+    
+    @Autowired
+    private RelanceAutomatiqueService relanceAutomatiqueService;
 
     public CreanceResponseDTO createCreance(CreanceRequestDTO dto) {
 
@@ -46,8 +50,14 @@ public class CreanceService {
         
         // Calculer les pénalités initiales
         penaliteService.mettreAJourPenalites(creance);
-
-        return CreanceMapper.toDto(creanceRepository.save(creance));
+        
+        // Sauvegarder la créance
+        creance = creanceRepository.save(creance);
+        
+        // Créer les 3 relances automatiques (1 envoyée, 2 planifiées)
+        relanceAutomatiqueService.creerRelancesAutomatiques(creance, agent);
+        
+        return CreanceMapper.toDto(creance);
     }
 
     public List<CreanceResponseDTO> getAllCreances() {
