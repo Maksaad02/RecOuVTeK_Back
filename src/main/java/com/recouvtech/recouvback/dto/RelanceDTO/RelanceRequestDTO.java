@@ -15,4 +15,5 @@ public class RelanceRequestDTO {
     private TypeRelance typeRelance;
     private StatutRelance statutRelance;
     private String commentaire;
+    private String message;
 }
