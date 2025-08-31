@@ -21,7 +21,7 @@ public class Relance {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "creance_num_facture", referencedColumnName = "num_facture", nullable = false)
+    @JoinColumn(name = "creance_id", referencedColumnName = "id", nullable = false)
     public Creance creance;
 
     @ManyToOne(optional = false)

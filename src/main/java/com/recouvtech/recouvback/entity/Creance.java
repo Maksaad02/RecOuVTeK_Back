@@ -16,6 +16,9 @@ import java.util.List;
 public class Creance {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "num_facture", nullable = false, unique = true)
     private String numFacture;
 

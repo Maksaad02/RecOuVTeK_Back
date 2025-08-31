@@ -12,7 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/creances")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class CreanceController {
 
     private final CreanceService creanceService;

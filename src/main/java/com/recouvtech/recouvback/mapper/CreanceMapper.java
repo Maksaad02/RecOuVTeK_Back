@@ -11,7 +11,7 @@ public class CreanceMapper {
     public static CreanceResponseDTO toDto(Creance creance) {
         if (creance == null) return null;
         CreanceResponseDTO dto = new CreanceResponseDTO();
-        dto.setId(null); // Creance uses numFacture as ID, set if needed
+        dto.setId(creance.getId()); // Creance uses numFacture as ID, set if needed
         dto.setNumFacture(creance.getNumFacture());
         dto.setEcheance(creance.getEcheance());
         dto.setMontantFacture(creance.getMontantFacture());

@@ -31,7 +31,7 @@ public class CreanceService {
 
     public CreanceResponseDTO createCreance(CreanceRequestDTO dto) {
 
-        if (creanceRepository.existsById(dto.getNumFacture())) {
+        if (creanceRepository.existsByNumFacture(dto.getNumFacture())) {
             throw new RuntimeException("Une créance avec ce numéro de facture existe déjà : " + dto.getNumFacture());
         }
 
@@ -77,8 +77,10 @@ public class CreanceService {
     }
 
     public CreanceResponseDTO getByNumFacture(String numFacture) {
-        Creance creance = creanceRepository.findById(numFacture)
-                .orElseThrow(() -> new RuntimeException("Créance non trouvée pour la facture : " + numFacture));
+        Creance creance = creanceRepository.findByNumFacture(numFacture);
+        if (creance == null) {
+            throw new RuntimeException("Créance non trouvée pour la facture : " + numFacture);
+        }
         
         // Mettre à jour les pénalités
         penaliteService.mettreAJourPenalites(creance);
@@ -90,8 +92,10 @@ public class CreanceService {
     }
 
     public CreanceResponseDTO updateCreance(String numFacture, CreanceRequestDTO dto) {
-        Creance creance = creanceRepository.findById(numFacture)
-                .orElseThrow(() -> new RuntimeException("Créance non trouvée pour : " + numFacture));
+        Creance creance = creanceRepository.findByNumFacture(numFacture);
+        if (creance == null) {
+            throw new RuntimeException("Créance non trouvée pour : " + numFacture);
+        }
 
         Utilisateur agent = utilisateurRepository.findByNom(dto.getAgentName());
         Client client = clientRepository.findByRaisonSociale(dto.getClientName());
@@ -105,7 +109,11 @@ public class CreanceService {
     }
 
     public void deleteCreance(String numFacture) {
-        creanceRepository.deleteById(numFacture);
+        Creance creance = creanceRepository.findByNumFacture(numFacture);
+        if (creance == null) {
+            throw new RuntimeException("Créance non trouvée pour : " + numFacture);
+        }
+        creanceRepository.delete(creance);
     }
     
     /**

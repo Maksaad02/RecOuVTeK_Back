@@ -11,25 +11,25 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "raison_sociale")
+    @Column(name = "raison_sociale", nullable = false, unique = true)
     private String raisonSociale;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "telephone")
+    @Column(name = "telephone", nullable = false, unique = true)
     private String telephone;
 
-    @Column(name = "rc")
+    @Column(name = "rc", nullable = false, unique = true)
     private String rc;
 
-    @Column(name = "adresse")
+    @Column(name = "adresse", nullable = false, unique = true)
     private String adresse;
 
-    @Column(name = "ice")
+    @Column(name = "ice", nullable = false, unique = true)
     private String ice;
 
-    @Column(name = "identite_fiscale")
+    @Column(name = "identite_fiscale", nullable = false, unique = true)
     private String identiteFiscale;
 
     @ManyToOne
