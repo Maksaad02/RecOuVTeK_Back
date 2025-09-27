@@ -36,3 +36,5 @@
 **/docker-compose.override.yml
 **/config/development/
 **/src/test/
+# Env files
+.env

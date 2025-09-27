@@ -58,9 +58,12 @@ public class PenaliteService {
         LocalDate aujourdhui = LocalDate.now();
         
         // Vérifier si un recalcul est nécessaire
+        // Recalculer si jamais calculé ou si les pénalités sont 0 mais qu'il devrait y en avoir
         if (creance.getDateCalculPenalites() != null && 
-            creance.getDateCalculPenalites().equals(aujourdhui)) {
-            return; // Déjà calculé aujourd'hui
+            creance.getDateCalculPenalites().equals(aujourdhui) &&
+            creance.getMontantPenalites() != null && 
+            creance.getMontantPenalites() > 0) {
+            return; // Déjà calculé aujourd'hui et pénalités > 0
         }
         
         Double nouvellesPenalites = calculerPenalites(creance);

@@ -12,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/reglements")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ReglementController {
 
     private final ReglementService reglementService;

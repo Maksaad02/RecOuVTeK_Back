@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/relances")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class RelanceController {
 
     private final RelanceService relanceService;
