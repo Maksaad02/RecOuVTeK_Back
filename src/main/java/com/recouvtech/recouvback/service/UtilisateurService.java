@@ -9,6 +9,7 @@ import com.recouvtech.recouvback.entity.Utilisateur;
 import com.recouvtech.recouvback.entity.enums.RoleAgent;
 import com.recouvtech.recouvback.mapper.UtilisateurMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class UtilisateurService {
 
     private final UtilisateurRepository utilisateurRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UtilisateurResponseDTO create(UtilisateurRequestDTO dto) {
         // Vérification email unique
@@ -30,6 +32,8 @@ public class UtilisateurService {
         Role role = roleRepository.findById(dto.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Rôle non trouvé"));
         Utilisateur utilisateur = UtilisateurMapper.fromRequestDto(dto, role);
+        // Encode password before saving
+        utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
         return UtilisateurMapper.toDto(utilisateurRepository.save(utilisateur));
     }
 
@@ -52,6 +56,8 @@ public class UtilisateurService {
         Role role = roleRepository.findById(dto.getRoleId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
         UtilisateurMapper.updateFromRequestDto(utilisateur, dto, role);
+        // Encode updated password as well
+        utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
         return UtilisateurMapper.toDto(utilisateurRepository.save(utilisateur));
     }
 

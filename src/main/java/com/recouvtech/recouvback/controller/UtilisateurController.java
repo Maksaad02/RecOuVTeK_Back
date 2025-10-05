@@ -4,6 +4,7 @@ import com.recouvtech.recouvback.dto.UtilisateurDTO.UtilisateurRequestDTO;
 import com.recouvtech.recouvback.dto.UtilisateurDTO.UtilisateurResponseDTO;
 import com.recouvtech.recouvback.service.UtilisateurService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ public class UtilisateurController {
     private final UtilisateurService utilisateurService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UtilisateurResponseDTO> create(@RequestBody UtilisateurRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(utilisateurService.create(dto));
@@ -34,26 +36,31 @@ public class UtilisateurController {
 
     
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UtilisateurResponseDTO> getAll() {
         return utilisateurService.getAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UtilisateurResponseDTO getById(@PathVariable Long id) {
         return utilisateurService.getById(id);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public UtilisateurResponseDTO update(@PathVariable Long id, @RequestBody UtilisateurRequestDTO dto) {
         return utilisateurService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         utilisateurService.delete(id);
     }
 
     @PutMapping("/{id}/role") /**/
+    @PreAuthorize("hasRole('ADMIN')")
     public UtilisateurResponseDTO updateRole(@PathVariable Long id, @RequestBody Map<String, String> payload) {
         return utilisateurService.updateRole(id, payload.get("role"));
     }

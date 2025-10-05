@@ -7,6 +7,7 @@ import com.recouvtech.recouvback.entity.Role;
 import com.recouvtech.recouvback.entity.Utilisateur;
 import com.recouvtech.recouvback.entity.enums.RoleAgent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ public class AuthController {
     private final JwtUtils jwtUtils;
 
     @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> register(@RequestBody Utilisateur u) {
         if (utilisateurRepo.existsByEmail(u.getEmail())) {
             return ResponseEntity.badRequest().body("Email déjà utilisé");
