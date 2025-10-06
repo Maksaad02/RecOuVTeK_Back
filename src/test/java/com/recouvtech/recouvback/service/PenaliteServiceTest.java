@@ -32,7 +32,7 @@ class PenaliteServiceTest {
         
         // Create test agent
         agent = new Utilisateur();
-        agent.setId(1L);
+        agent.setIdAgentRecouv(1L);
         agent.setNom("Test Agent");
         
         // Create test creance
