@@ -25,7 +25,7 @@ public class CreanceService {
     private final UtilisateurRepository utilisateurRepository;
     private final ClientRepository clientRepository;
     private final PenaliteService penaliteService;
-    
+
     @Autowired
     private RelanceAutomatiqueService relanceAutomatiqueService;
 
@@ -47,22 +47,22 @@ public class CreanceService {
 
         Creance creance = CreanceMapper.fromRequestDto(dto, agent, client);
         creance.setMontantEncaisse(0.0); // initialise à 0
-        
+
         // Calculer les pénalités initiales
         penaliteService.mettreAJourPenalites(creance);
-        
+
         // Sauvegarder la créance
         creance = creanceRepository.save(creance);
-        
+
         // Créer les 3 relances automatiques (1 envoyée, 2 planifiées)
         relanceAutomatiqueService.creerRelancesAutomatiques(creance, agent);
-        
+
         return CreanceMapper.toDto(creance);
     }
 
     public List<CreanceResponseDTO> getAllCreances() {
         List<Creance> creances = creanceRepository.findAll();
-        
+
         // Mettre à jour les pénalités pour toutes les créances
         creances.forEach(creance -> {
             penaliteService.mettreAJourPenalites(creance);
@@ -70,7 +70,7 @@ public class CreanceService {
                 creanceRepository.save(creance); // Sauvegarder les mises à jour
             }
         });
-        
+
         return creances.stream()
                 .map(CreanceMapper::toDto)
                 .collect(Collectors.toList());
@@ -81,13 +81,13 @@ public class CreanceService {
         if (creance == null) {
             throw new RuntimeException("Créance non trouvée pour la facture : " + numFacture);
         }
-        
+
         // Mettre à jour les pénalités
         penaliteService.mettreAJourPenalites(creance);
         if (creance.getStatut() != StatutCreance.PAYEE) {
             creanceRepository.save(creance);
         }
-        
+
         return CreanceMapper.toDto(creance);
     }
 
@@ -99,9 +99,9 @@ public class CreanceService {
 
         Utilisateur agent = utilisateurRepository.findByNom(dto.getAgentName());
         Client client = clientRepository.findByRaisonSociale(dto.getClientName());
-        
+
         CreanceMapper.updateFromRequestDto(creance, dto, agent, client);
-        
+
         // Recalculer les pénalités après mise à jour
         penaliteService.mettreAJourPenalites(creance);
 
@@ -115,7 +115,7 @@ public class CreanceService {
         }
         creanceRepository.delete(creance);
     }
-    
+
     /**
      * Force le recalcul des pénalités pour toutes les créances
      */
@@ -125,5 +125,48 @@ public class CreanceService {
             penaliteService.forcerRecalculPenalites(creance);
             creanceRepository.save(creance);
         });
+    }
+
+    /**
+     * Get all debts for a specific client (for External Chatbot API)
+     * 
+     * @param clientId Client ID
+     * @return List of debts with calculated penalties
+     */
+    public List<CreanceResponseDTO> getCreancesByClientId(Long clientId) {
+        List<Creance> creances = creanceRepository.findByClientId(clientId);
+
+        // Update penalties before returning
+        creances.forEach(creance -> {
+            penaliteService.mettreAJourPenalites(creance);
+            if (creance.getStatut() != StatutCreance.PAYEE) {
+                creanceRepository.save(creance);
+            }
+        });
+
+        return creances.stream()
+                .map(CreanceMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all unpaid debts (for External Chatbot API)
+     * 
+     * @return List of all unpaid debts
+     */
+    public List<CreanceResponseDTO> getAllUnpaidCreances() {
+        List<Creance> creances = creanceRepository.findAllUnpaid();
+
+        // Update penalties before returning
+        creances.forEach(creance -> {
+            penaliteService.mettreAJourPenalites(creance);
+            if (creance.getStatut() != StatutCreance.PAYEE) {
+                creanceRepository.save(creance);
+            }
+        });
+
+        return creances.stream()
+                .map(CreanceMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

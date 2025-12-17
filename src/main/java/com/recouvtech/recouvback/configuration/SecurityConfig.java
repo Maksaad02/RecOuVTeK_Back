@@ -1,6 +1,7 @@
 package com.recouvtech.recouvback.configuration;
 
 import com.recouvtech.recouvback.filter.JwtAuthenticationFilter;
+import com.recouvtech.recouvback.security.ApiKeyAuthFilter;
 import com.recouvtech.recouvback.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtFilter;
+    private final ApiKeyAuthFilter apiKeyAuthFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,30 +38,32 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // External Chatbot API - secured by API Key filter
+                        .requestMatchers("/api/external/**").permitAll()
+
                         // Autorise ces routes sans authentification
                         .requestMatchers("/api/register", "/api/login").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/reglements/**").permitAll() // ⬅️ Allow GET on reglements
+                        // .requestMatchers(HttpMethod.GET, "/api/reglements/**").permitAll() // ⬅️
+                        // Allow GET on reglements
                         // Autoriser les preflight CORS (navigateur)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Toutes les autres requêtes doivent être authentifiées
-                        .requestMatchers("/api/**").authenticated()
-                )
+                        .requestMatchers("/api/**").authenticated())
                 // Renvoyer 401 si non authentifié (au lieu d'un 403 générique)
                 .exceptionHandling(e -> e.authenticationEntryPoint((req, res, ex) -> res.sendError(401)))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationManager(authManager(http))
+                // API Key filter BEFORE JWT filter (external API uses different auth)
+                .addFilterBefore(apiKeyAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-
-
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder builder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
         builder
                 .userDetailsService(userDetailsService)
@@ -73,14 +77,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:*"
-        ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS"));
+                "http://localhost:*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
 

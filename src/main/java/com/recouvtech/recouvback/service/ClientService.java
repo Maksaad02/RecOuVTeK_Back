@@ -60,4 +60,16 @@ public class ClientService {
     public void deleteClient(Long id) {
         clientRepository.deleteById(id);
     }
+
+    /**
+     * Search clients by keyword (for External Chatbot API)
+     * 
+     * @param query Search term (raison sociale, ICE, or telephone)
+     * @return List of matching clients
+     */
+    public List<ClientResponseDTO> searchClients(String query) {
+        return clientRepository.searchByKeyword(query).stream()
+                .map(ClientMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }
