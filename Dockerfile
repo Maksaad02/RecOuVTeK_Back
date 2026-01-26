@@ -28,7 +28,7 @@ COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 
 # Set environment variables if needed
-# ENV SPRING_PROFILES_ACTIVE=prod
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
